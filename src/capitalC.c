@@ -3,21 +3,19 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
-inline int Close(int fd) {
+inline void Close(int fd) {
     int ret = close(fd);
     if (ret == -1) {
         perror("Close");
         exit(errno);
     }
-    return ret;
 }
-inline int FClose(FILE* fp) {
+inline void FClose(FILE* fp) {
     int ret = fclose(fp);
     if (ret == -1) {
         perror("FClose");
         exit(errno);
     }
-    return ret;
 }
 inline DIR* Fdopendir(int fd) {
     DIR* ret = fdopendir(fd);
