@@ -75,3 +75,41 @@ void* Calloc(size_t nmemb, size_t size) {
     }
     return ret;
 }
+void Read(int fd, void* buf, size_t count) {
+    while (1) {
+        ssize_t ret = read(fd, buf, count);
+        if (ret == -1) {
+            switch (errno) {
+                case EINTR:
+                    // try again
+                    break;
+                default:
+                    DIE();
+            }
+        } else if (ret < count) {
+            count -= ret;
+            buf += ret;
+        } else {
+            return;
+        }
+    }
+}
+void Write(int fd, const void* buf, size_t count) {
+    while (1) {
+        ssize_t ret = write(fd, buf, count);
+        if (ret == -1) {
+            switch (errno) {
+                case EINTR:
+                    // try again
+                    break;
+                default:
+                    DIE();
+            }
+        } else if (ret < count) {
+            count -= ret;
+            buf += ret;
+        } else {
+            return;
+        }
+    }
+}

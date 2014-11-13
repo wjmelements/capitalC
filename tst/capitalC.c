@@ -16,5 +16,14 @@ int main() {
     DIR* dp = Fdopendir(dfd);
     Closedir(dp);
     Close(fd);
+    const size_t buffer_size = 400000;
+    char* buffer = Malloc(buffer_size);
+    int rfd = Open("/dev/urandom", O_RDONLY);
+    Read(rfd, buffer, buffer_size);
+    Close(rfd);
+    int dnfd = Open("/dev/null", O_WRONLY);
+    Write(dnfd, buffer, buffer_size);
+    Close(dnfd);
+    Free(buffer);
     return 0;
 }
