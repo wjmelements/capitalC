@@ -2,6 +2,8 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -46,6 +48,34 @@ pid_t Fork(void) {
         DIE();
     }
     return ret;
+}
+void Kill(pid_t pid, int sig) {
+    int ret = kill(pid, sig);
+    if (ret == -1) {
+        int e = errno;
+        char buf[16];
+        switch (e) {
+            case EINVAL:
+                Snprintf(buf, sizeof(buf), "%i", sig);
+                break;
+            case EPERM:
+            case ESRCH:
+                Snprintf(buf, sizeof(buf), "%u", pid);
+                break;
+            default:
+                DIE();
+        }
+        errno = e;
+        DIEWITH(buf);
+    }
+}
+void Snprintf(char* str, size_t size, const char* format, ...) {
+    va_list arg;
+    va_start(arg, format);
+    int ret = vsnprintf(str, size, format, arg);
+    if (ret < 0) {
+        DIE();
+    }
 }
 int Open(const char* path, int flags) {
     int ret = open(path, flags);
