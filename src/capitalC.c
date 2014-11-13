@@ -61,3 +61,17 @@ FILE* Fopen(const char* path, const char* mode) {
     }
     return ret;
 }
+void* Malloc(size_t size) {
+    void* ret = malloc(size);
+    if (ret == NULL) {
+        DIE();
+    }
+    return ret;
+}
+void* Calloc(size_t nmemb, size_t size) {
+    void* ret = calloc(nmemb, size);
+    if (ret == NULL) {
+        DIE();
+    }
+    return ret;
+}
