@@ -143,3 +143,51 @@ void Write(int fd, const void* buf, size_t count) {
         }
     }
 }
+/*
+ * begin pthread stuff
+ */
+void Pthread_create(pthread_t* thread, pthread_attr_t* attr, void*(*func)(void*), void* arg) {
+    errno = pthread_create(thread, attr, func, arg);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_detach(pthread_t thread) {
+    errno = pthread_detach(thread);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_join(pthread_t thread, void** retval) {
+    errno = pthread_join(thread, retval);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr) {
+    errno = pthread_mutex_init(mutex, attr);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_mutex_lock(pthread_mutex_t* mutex) {
+    errno = pthread_mutex_lock(mutex);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_mutex_unlock(pthread_mutex_t* mutex) {
+    errno = pthread_mutex_unlock(mutex);
+    if (errno) {
+        DIE();
+    }
+}
+void Pthread_mutex_destroy(pthread_mutex_t* mutex) {
+    errno = pthread_mutex_destroy(mutex);
+    if (errno) {
+        DIE();
+    }
+}
+/* 
+ *  end pthread stuff
+ */

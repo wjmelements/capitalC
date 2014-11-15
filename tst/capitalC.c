@@ -4,8 +4,37 @@
 #include "capitalC.h"
 #include <assert.h>
 #include <fcntl.h>
+#include <sched.h>
 #include <signal.h>
 #include <string.h>
+
+
+static volatile size_t count = 0;
+void* func(void* _arg) {
+    pthread_mutex_t* arg = _arg;
+    Pthread_mutex_lock(arg);
+    count++;
+    Pthread_mutex_unlock(arg);
+}
+void test_pthreads() {
+    pthread_t thread;
+    pthread_mutex_t mutex;
+    Pthread_mutex_init(&mutex, NULL);
+    const size_t expected = 2;
+    for (size_t i = 0; i < expected; i++) {
+        Pthread_create(&thread, NULL, func, &mutex);
+        Pthread_detach(thread);
+    }
+    while (count != expected) {
+        sched_yield();
+        /*
+        Pthread_mutex_lock(&mutex);
+        Pthread_mutex_unlock(&mutex);
+        */
+    }
+    Pthread_mutex_destroy(&mutex);
+}
+
 int main() {
     pid_t pid = Fork();
     if (pid) {
@@ -39,5 +68,6 @@ int main() {
     Write(dnfd, buffer, buffer_size);
     Close(dnfd);
     Free(buffer);
+    test_pthreads();
     return 0;
 }
