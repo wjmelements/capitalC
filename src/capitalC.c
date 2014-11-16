@@ -2,10 +2,12 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/socket.h>
 
  
 #define DIE()\
@@ -137,6 +139,51 @@ void Write(int fd, const void* buf, size_t count) {
             }
         } else if (ret < count) {
             count -= ret;
+            buf += ret;
+        } else {
+            return;
+        }
+    }
+}
+int Socket(int domain, int type, int protocol) {
+    int ret = socket(domain, type, protocol);
+    if (ret == -1) {
+        DIE();
+    }
+    return ret;
+}
+void Connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
+    int ret = connect(sockfd, addr, addrlen);
+    if (ret == -1) {
+        DIE();
+    }
+}
+void Listen(int sockfd, int backlog) {
+    int ret = listen(sockfd, backlog);
+    if (ret == -1) {
+        DIE();
+    }
+}
+int Accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) {
+    int ret = accept(sockfd, addr, addrlen);
+    if (ret == -1) {
+        DIE();
+    }
+    return ret;
+}
+void Send(int sockfd, const void* buf, size_t len, int flags) {
+    while (1) {
+        ssize_t ret = send(sockfd, buf, len, flags);
+        if (ret == -1) {
+            switch (errno) {
+                case EINTR:
+                    // try again
+                    break;
+                default:
+                    DIE();
+            }
+        } else if (ret < len) {
+            len -= ret;
             buf += ret;
         } else {
             return;
