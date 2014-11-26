@@ -25,6 +25,12 @@ void Close(int fd) {
         DIE();
     }
 }
+void Lseek(int fd, off_t offset, int whence) {
+    off_t ret = lseek(fd, offset, whence);
+    if (ret == (off_t) -1) {
+        DIE();
+    }
+}
 void FClose(FILE* fp) {
     int ret = fclose(fp);
     if (ret == -1) {

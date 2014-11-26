@@ -15,6 +15,7 @@ pid_t Fork(void);
 #define Free free
 void Kill(pid_t pid, int sig);
 void Listen(int sockfd, int backlog);
+void Lseek(int fd, off_t offset, int whence);
 void* Malloc(size_t size);
 int Open(const char* path, int flags);
 void Pthread_create(pthread_t* thread, pthread_attr_t* attr, void*(*func)(void*), void* arg);
