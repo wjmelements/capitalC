@@ -34,7 +34,7 @@ lib/%.o: src/%.cpp include/%.h | lib
 	$(CPP) -c $(CXXFLAGS) $(INCLUDE) $< -o $@
 lib/%.o: src/%.c include/%.h | lib
 	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
-tst/bin/%: tst/%.cpp lib/%.o | tst/bin
+tst/bin/%: tst/%.cpp | tst/bin
 	$(CPP) $(CXXFLAGS) $(INCLUDE) $^ -o $@
-tst/bin/%: tst/%.c lib/%.o | tst/bin
+tst/bin/%: tst/%.c | tst/bin
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $@
