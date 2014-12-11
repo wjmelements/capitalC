@@ -1,3 +1,6 @@
+# Preprocessed C
+*.i
+
 # Object files
 *.o
 *.ko

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <unistd.h>
 /*
 int Accept(int sockfd, struct sockaddr*, socklen_t*);
@@ -40,16 +41,23 @@ void Read(int fd, void* buf, size_t count);
 void Send(int sockfd, const void* buf, size_t len, int flags);
 void Snprintf(char* str, size_t size, const char* format, ...);
 int Socket(int domain, int type, int protocol);
+void Wait(int* status);
 void Write(int fd, const void* buf, size_t count);
 */
  
 #define DIE()\
-    perror(__func__);\
-    exit(errno)
+    do {\
+        int e = errno;\
+        perror(__func__);\
+        exit(e);\
+    } while (0)
 
 #define DIEWITH(arg)\
-    perror(arg);\
-    exit(errno)
+    do {\
+        int e = errno;\
+        perror(arg);\
+        exit(e);\
+    } while (0)
 
 
 static inline void Close(int fd) {
@@ -64,7 +72,7 @@ static inline void Lseek(int fd, off_t offset, int whence) {
         DIE();
     }
 }
-static inline void FClose(FILE* fp) {
+static inline void Fclose(FILE* fp) {
     int ret = fclose(fp);
     if (ret == -1) {
         DIE();
@@ -90,6 +98,13 @@ static inline pid_t Fork(void) {
     }
     return ret;
 }
+static inline pid_t Wait(int* status) {
+    pid_t ret = wait(status);
+    if (ret == -1) {
+        DIE();
+    }
+    return ret;
+}
 static inline void Snprintf(char* str, size_t size, const char* format, ...) {
     va_list arg;
     va_start(arg, format);
@@ -101,9 +116,9 @@ static inline void Snprintf(char* str, size_t size, const char* format, ...) {
 static inline void Kill(pid_t pid, int sig) {
     int ret = kill(pid, sig);
     if (ret == -1) {
-        int e = errno;
+        int errnum = errno;
         char buf[16];
-        switch (e) {
+        switch (errnum) {
             case EINVAL:
                 Snprintf(buf, sizeof(buf), "%i", sig);
                 break;
@@ -114,7 +129,7 @@ static inline void Kill(pid_t pid, int sig) {
             default:
                 DIE();
         }
-        errno = e;
+        errno = errnum;
         DIEWITH(buf);
     }
 }
