@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 /*
@@ -20,16 +21,19 @@ void* Calloc(size_t nmemb, size_t size);
 void Close(int fd);
 void Closedir(DIR* dp);
 void Connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
+void Dup(int fd);
 void Fclose(FILE* fp);
 DIR* Fdopendir(int fd);
 FILE* Fopen(const char* path, const char* mode);
 pid_t Fork(void);
 void Free(void*)
+void Fstat(int fd, struct stat info);
 void Kill(pid_t pid, int sig);
 void Listen(int sockfd, int backlog);
 void Lseek(int fd, off_t offset, int whence);
 void* Malloc(size_t size);
 int Open(const char* path, int flags);
+void Pipe(int fd[2]);
 void Pthread_create(pthread_t* thread, pthread_attr_t* attr, void*(*func)(void*), void* arg);
 void Pthread_detach(pthread_t thread);
 void Pthread_join(pthread_t thread, void** retval);
@@ -65,6 +69,19 @@ static inline void Close(int fd) {
     if (ret == -1) {
         DIE();
     }
+}
+static inline void Pipe(int fds[2]) {
+    int ret = pipe(fds);
+    if (ret == -1) {
+        DIE();
+    }
+}
+static inline int Dup(int fd) {
+    int ret = dup(fd);
+    if (ret == -1) {
+        DIE();
+    }
+    return ret;
 }
 static inline void Lseek(int fd, off_t offset, int whence) {
     off_t ret = lseek(fd, offset, whence);
@@ -146,6 +163,12 @@ static inline FILE* Fopen(const char* path, const char* mode) {
         DIEWITH(path);
     }
     return ret;
+}
+static inline void Fstat(int fd, struct stat* info) {
+    int success = fstat(fd, info);
+    if (success == -1) {
+        DIE();
+    }
 }
 #define Free free
 static inline void* Malloc(size_t size) {
