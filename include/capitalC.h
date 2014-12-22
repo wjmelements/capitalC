@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <poll.h>
 #include <pthread.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -21,7 +22,7 @@ void* Calloc(size_t nmemb, size_t size);
 void Close(int fd);
 void Closedir(DIR* dp);
 void Connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
-void Dup(int fd);
+int Dup(int fd);
 void Fclose(FILE* fp);
 DIR* Fdopendir(int fd);
 FILE* Fopen(const char* path, const char* mode);
@@ -34,6 +35,7 @@ void Lseek(int fd, off_t offset, int whence);
 void* Malloc(size_t size);
 int Open(const char* path, int flags);
 void Pipe(int fd[2]);
+int Poll(struct pollfd*, nfds_t nfds, int timeout);
 void Pthread_create(pthread_t* thread, pthread_attr_t* attr, void*(*func)(void*), void* arg);
 void Pthread_detach(pthread_t thread);
 void Pthread_join(pthread_t thread, void** retval);
@@ -244,6 +246,13 @@ static inline void Listen(int sockfd, int backlog) {
 }
 static inline int Accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) {
     int ret = accept(sockfd, addr, addrlen);
+    if (ret == -1) {
+        DIE();
+    }
+    return ret;
+}
+static inline int Poll(struct pollfd* pollfds, nfds_t nfds, int timeout) {
+    int ret = poll(pollfds, nfds, timeout);
     if (ret == -1) {
         DIE();
     }
