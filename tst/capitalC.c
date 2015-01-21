@@ -16,6 +16,7 @@ void* func(void* _arg) {
     count++;
     Pthread_mutex_unlock(arg);
 }
+#ifndef NDEBUG
 #define test_negative(FUNC, ERRNO)\
     {\
         pid_t pid = Fork();\
@@ -33,6 +34,9 @@ void* func(void* _arg) {
         }\
         assert(WEXITSTATUS(status) == ERRNO);\
     }
+#else //NDEBUG
+#define test_negative(FUNC, ERRNO)
+#endif //NDEBUG
 
 void test_negatives() {
     pthread_t anything;

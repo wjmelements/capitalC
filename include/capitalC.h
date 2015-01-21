@@ -51,6 +51,7 @@ void Wait(int* status);
 void Write(int fd, const void* buf, size_t count);
 */
  
+#ifndef NDEBUG
 #define DIE()\
     do {\
         int e = errno;\
@@ -64,6 +65,10 @@ void Write(int fd, const void* buf, size_t count);
         perror(arg);\
         exit(e);\
     } while (0)
+#else // NDEBUG
+#define DIE()
+#define DIEWITH(arg)
+#endif // NDEBUG
 
 
 static inline void Close(int fd) {

@@ -6,7 +6,8 @@ CXXFLAGS=$(filter-out -std=gnu11, $(CFLAGS)) -std=gnu++11 -fno-exceptions -Wno-w
 MKDIRS=lib bin tst/bin .pass .pass/tst/bin
 INCLUDE=$(addprefix -I,include)
 EXECS=$(addprefix bin/,)
-TESTS=$(addprefix tst/bin/, capitalC)
+PTESTS=capitalC
+TESTS=$(addprefix tst/bin/, $(PTESTS)) $(addprefix tst/bin/ndb, $(PTESTS))
 
 .PHONY: default all clean again check distcheck dist-check
 .SECONDARY:
@@ -36,5 +37,9 @@ lib/%.o: src/%.c include/%.h | lib
 	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
 tst/bin/%: tst/%.cpp | tst/bin
 	$(CPP) $(CXXFLAGS) $(INCLUDE) $^ -o $@
+tst/bin/ndb%: tst/%.cpp | tst/bin
+	$(CPP) $(CXXFLAGS) -DNDEBUG $(INCLUDE) $^ -o $@
 tst/bin/%: tst/%.c | tst/bin
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $@
+tst/bin/ndb%: tst/%.c | tst/bin
+	$(CC) $(CFLAGS) -DNDEBUG $(INCLUDE) $^ -o $@
