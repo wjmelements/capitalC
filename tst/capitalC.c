@@ -15,6 +15,7 @@ void* func(void* _arg) {
     Pthread_mutex_lock(arg);
     count++;
     Pthread_mutex_unlock(arg);
+    return NULL;
 }
 #ifndef NDEBUG
 #define test_negative(FUNC, ERRNO)\
@@ -100,8 +101,14 @@ int main() {
     char origin[16] = "abcdefg";
     Snprintf(buf, 16, origin);
     assert(strncmp(buf, origin, 16) == 0);
-    int fd = Open("include/capitalC.h", O_NOATIME);
-    int dfd = Open("include", O_DIRECTORY | O_NOATIME);
+    int oflags;
+    #ifdef __linux__
+    oflags = NOATIME;
+    #else
+    oflags = 0;
+    #endif
+    int fd = Open("include/capitalC.h", oflags);
+    int dfd = Open("include", O_DIRECTORY | oflags);
     DIR* dp = Fdopendir(dfd);
     Closedir(dp);
     Close(fd);
